@@ -1,0 +1,11 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block main %}
+
+    {{ form_start(form) }}
+
+    {{ form_widget(form.URL)}}
+    {{ form_widget(form.Search, { 'attr': {'class': 'btn btn-primary'} }) }}
+
+    {{ form_end(form) }}
+{% endblock main %}
