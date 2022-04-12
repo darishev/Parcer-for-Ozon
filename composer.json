@@ -27,6 +27,7 @@
 		"ext-ctype": "*",
 		"ext-iconv": "*",
 		"ext-json": "*",
+		"ext-libxml": "*",
 		"ext-mbstring": "*",
 		"ext-pdo": "*",
 		"ext-pdo_mysql": "*",

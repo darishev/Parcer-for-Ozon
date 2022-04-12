@@ -18,6 +18,7 @@ use GuzzleHttp\Client;
 
 class DashboardController extends AbstractDashboardController
 {
+
     #[Route('/parser', name: 'admin')]
     public function form(Request $request)
     {
@@ -26,11 +27,55 @@ class DashboardController extends AbstractDashboardController
             ->add('Search', SubmitType::class)
             ->getForm();
 
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $url = $request->request->all('form')['URL'];
+//
+            if (preg_match("/^(http:\/\/|https:\/\/)*[а-яА-ЯёЁa-z0-9\-_]+(\.[а-яА-ЯёЁa-z0-9\-_]+)+(\/\S*)*$/iu", $url)) {
+// Инициализируем класс для работы с удаленными веб-ресурсами
+            $client = new Client();
+
+// Делаем запрос, получаем ответ
+            $n = $client->get($url);
+
+            $crawler = new Crawler($n->getBody()->getContents());
+            var_dump($crawler);
+//            foreach ($response as $domElement) {
+//                var_dump($domElement->nodeName);
+//                }
+
+            } else echo 'URL has not valid values';
+        }
+
         return $this->render('/EasyAdminBundle/page/content.html.twig', [
             'form' => $form->createView(),
         ]);
     }
 
+//    public function collectData()
+//    {
+//// Инициализируем класс для работы с удаленными веб-ресурсами
+//        $client = new Client();
+//
+//// Делаем запрос, получаем ответ
+//        $response = $client->request('POST', $url, [
+//        ]);
+//
+//// Выводим ответ
+//        return $response->getBody();
+//    }
+//
+//    public function collectData()
+//    {
+//        //  Проверка URL на валидность
+//            if (preg_match("/^(http:\/\/|https:\/\/)*[а-яА-ЯёЁa-z0-9\-_]+(\.[а-яА-ЯёЁa-z0-9\-_]+)+(\/\S*)*$/iu", $url))
+//            {
+//                echo true;
+//            }
+//            else echo 'URL has not valid values';
+//
+//    }
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()

@@ -2,24 +2,23 @@
   namespace App\Service;
 
   use Symfony\Component\DomCrawler\Crawler;
+  use Symfony\Component\HttpFoundation\Response;
+  use App\Service\DOMDocument;
+  use App\Service\DOMXPath;
 
    class ParserService
    {
-       public function parse(string $url)
+       public function parse(string $url, Response $response)
        {
-           $c = curl_init($url);
-           curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
-           curl_setopt($c, CURLOPT_HEADER, false);
+           $httpClient = new \GuzzleHttp\Client();
+           $response = $httpClient->get("https://www.ozon.ru/category/sportivnye-aksessuary-33004/");
+           $htmlString = (string) $response->getBody();
+//add this line to suppress any warnings
+           libxml_use_internal_errors(true);
 
-           // Сохраняем HTML страницы.
-           $page = curl_exec($c);
-
-           // Если не получилось получить доступ к странице (например, из-за частых
-           // запросов или если страницы не существует).
-           if (empty($page)) {
-               return;
-           }
-
+           $doc = new DOMDocument();
+           $doc->loadHTML($htmlString);
+           $xpath = new DOMXPath($doc);
            $crawler = new Crawler($page, "https://www.ozon.ru/");
         }
    }
