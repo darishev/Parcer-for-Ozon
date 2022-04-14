@@ -16,6 +16,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\DomCrawler\Crawler;
 use GuzzleHttp\Client;
+use Twig\Environment;
+
 
 class DashboardController extends AbstractDashboardController
 {
@@ -24,6 +26,7 @@ class DashboardController extends AbstractDashboardController
     public function form(Request $request)
     {
         $ParserService = new ParserService();
+
         $form = $this->createFormBuilder()
             ->add('URL', TextType::class)
             ->add('Search', SubmitType::class)
@@ -33,70 +36,54 @@ class DashboardController extends AbstractDashboardController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $url = $request->request->all('form')['URL'];
-            $pattern = "/^(?:ftp|https?|feed)?:?\/\/(?:(?:(?:[\w\.\-\+!$&'\(\)*\+,;=]|%[0-9a-f]{2})+:)*
-    (?:[\w\.\-\+%!$&'\(\)*\+,;=]|%[0-9a-f]{2})+@)?(?:
-    (?:[a-z0-9\-\.]|%[0-9a-f]{2})+|(?:\[(?:[0-9a-f]{0,4}:)*(?:[0-9a-f]{0,4})\]))(?::[0-9]+)?(?:[\/|\?]
-    (?:[\w#!:\.\?\+\|=&@$'~*,;\/\(\)\[\]\-]|%[0-9a-f]{2})*)?$/xi";
-
-            if (preg_match($pattern, $url)) {
-//                $ParserService->collect($url, $request);
-           $client = new Client();
-           $n = $client->get($url);
-
-           $crawler = new Crawler($n->getBody()->getContents());
-
+//            if (collectData()){
+                $result = $ParserService->collect($url);
 //Прописать условие? если товаров нет - возвращаем статистику - 0 товаров
-
-           $pricePath = $crawler->filter(".ui-s2");
-           $namePath = $crawler->filter(".tile-hover-target.li9");
-           $sellerPath = $crawler->filter(".i0n.in1");
-           $reviews_count = $crawler->filter(".c0y");
-//           $skuPath = $crawler->filter("")->link();
-           $tag = $crawler->filter(".im7.tile-hover-target.mi8");
-           foreach ($reviews_count  as $r){
-               var_dump($r);
-           }
-           $b = [];
-           foreach ($namePath as $a) {
-               var_dump($b[] = $a->nodeValue);
-           }
-
-//           if (strstr($a, ' ', true)){
-//               $b[] =
-//           }
-//       }array_push($b, strstr($a, ' ', true));
-//                var_dump($b[] = $a->nodeValue);
             } else echo 'URL has not valid values';
-        }
+//        }
 
         return $this->render('/EasyAdminBundle/page/content.html.twig', [
             'form' => $form->createView(),
         ]);
     }
 
-//    public function collectData()
-//    {
-//// Инициализируем класс для работы с удаленными веб-ресурсами
-//        $client = new Client();
+    public function collectData(Request $request)
+    {
+        $url = $request->request->all('form')['URL'];
+        //  Проверка URL
+            if (preg_match("/^(?:ftp|https?|feed)?:?\/\/(?:(?:(?:[\w\.\-\+!$&'\(\)*\+,;=]|%[0-9a-f]{2})+:)*
+    (?:[\w\.\-\+%!$&'\(\)*\+,;=]|%[0-9a-f]{2})+@)?(?:
+    (?:[a-z0-9\-\.]|%[0-9a-f]{2})+|(?:\[(?:[0-9a-f]{0,4}:)*(?:[0-9a-f]{0,4})\]))(?::[0-9]+)?(?:[\/|\?]
+    (?:[\w#!:\.\?\+\|=&@$'~*,;\/\(\)\[\]\-]|%[0-9a-f]{2})*)?$/xi", $url))
+            {
+                return true;
+            }
+            else echo 'URL has not valid values';
+    }
+
+
+//if ($form->isSubmitted() && $form->isValid()) {
+//$em = $this->getDoctrine()->getManager();
 //
-//// Делаем запрос, получаем ответ
-//        $response = $client->request('POST', $url, [
-//        ]);
+//    // Получаем информацию о товаре с Яндекс маркета.
+//    // Возвращаем объект с нужными свойствами и потом записываем их в продукт.
+//    // $y_market_url = $scrapper->parse($product->getUrl());
+//    // The current node list is empty.
 //
-//// Выводим ответ
-//        return $response->getBody();
-//    }
+//try {
+//$y_market_url = $scrapper->parse($product->getUrl());
+//} catch (\Exception $e) {
+//    return;
+//}
 //
-//    public function collectData()
-//    {
-//        //  Проверка URL на валидность
-//            if (preg_match("/^(http:\/\/|https:\/\/)*[а-яА-ЯёЁa-z0-9\-_]+(\.[а-яА-ЯёЁa-z0-9\-_]+)+(\/\S*)*$/iu", $url))
-//            {
-//                echo true;
+//            if (isset($y_market_url)) {
+//                $product->setTitle($y_market_url->title)
+//                    ->setPrice($y_market_url->price)
+//                    ->setDescription($y_market_url->description)
+//                    ->setImage($y_market_url->image);
 //            }
-//            else echo 'URL has not valid values';
-//
-//    }
+//            $em->persist($product);
+//            $em->flush();
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
