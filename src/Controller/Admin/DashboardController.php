@@ -44,12 +44,13 @@ class DashboardController extends AbstractDashboardController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $url = $request->request->all('form')['URL'];
+            //Проверка URL на абсолютный путь
             if (preg_match("/^(?:ftp|https?|feed)?:?\/\/(?:(?:(?:[\w\.\-\+!$&'\(\)*\+,;=]|%[0-9a-f]{2})+:)*
     (?:[\w\.\-\+%!$&'\(\)*\+,;=]|%[0-9a-f]{2})+@)?(?:
     (?:[a-z0-9\-\.]|%[0-9a-f]{2})+|(?:\[(?:[0-9a-f]{0,4}:)*(?:[0-9a-f]{0,4})\]))(?::[0-9]+)?(?:[\/|\?]
     (?:[\w#!:\.\?\+\|=&@$'~*,;\/\(\)\[\]\-]|%[0-9a-f]{2})*)?$/xi", $url)) {
-                $result = $ParserService->collect($url);
-                dd($ParserService->collect($url));
+                return $result = $ParserService->collect($url);
+
             }
         }
             return $this->render('/EasyAdminBundle/page/content.html.twig', [
