@@ -50,7 +50,6 @@ class DashboardController extends AbstractDashboardController
     (?:[a-z0-9\-\.]|%[0-9a-f]{2})+|(?:\[(?:[0-9a-f]{0,4}:)*(?:[0-9a-f]{0,4})\]))(?::[0-9]+)?(?:[\/|\?]
     (?:[\w#!:\.\?\+\|=&@$'~*,;\/\(\)\[\]\-]|%[0-9a-f]{2})*)?$/xi", $url)) {
                 return $result = $ParserService->collect($url);
-
             }
         }
             return $this->render('/EasyAdminBundle/page/content.html.twig', [

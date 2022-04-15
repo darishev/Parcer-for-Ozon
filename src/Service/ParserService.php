@@ -62,7 +62,13 @@ class ParserService
             $seller = str_replace('продавец ', '', $seller);
             $products[$i]['seller'] = $seller;
         }
-            dd($products);
+
+        $result = $this->saveProduct($products);
+        return dd($result);
+    }
+
+    public function saveProduct(array $products)
+    {
         $em = $this->em;
         foreach ($products as $value) {
             $seller = $this->isSellerAlreadyExists($value['seller']);
@@ -81,32 +87,8 @@ class ParserService
             $em->persist($products);
             $em->flush($products);
         }
-//        $result = $this->saveProduct($products);
         return $products;
     }
-
-//    public function saveProduct(array $products)
-//    {
-//        $em = $this->em;
-//        foreach ($products as $value) {
-//            $seller = $this->isSellerAlreadyExists($value['seller']);
-//            if ($seller === 0) {
-//                $seller = new Seller();
-//                $seller->setName($value['seller']);
-//                $em->persist($seller);
-//                $em->flush($seller);
-//            }
-//            $products = new Products();
-//            $products->setName($value['name'])
-//                ->setPrice($value['price'])
-//                ->setReviews($value['reviews'])
-//                ->setSku($value['sku'])
-//                ->setSeller($seller);
-//            $em->persist($products);
-//            $em->flush($products);
-//        }
-//        return $products;
-//    }
 
     public function isSellerAlreadyExists(string $onlyOneSeller)
     {
