@@ -17,6 +17,8 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\DomCrawler\Crawler;
 use GuzzleHttp\Client;
 use Twig\Environment;
+use App\Entity\Products;
+use App\Entity\Seller;
 
 
 class DashboardController extends AbstractDashboardController
@@ -27,10 +29,11 @@ class DashboardController extends AbstractDashboardController
     {
         $this->em = $em;
     }
+
     #[Route('/parser', name: 'admin')]
     public function form(Request $request)
     {
-        $ParserService = new ParserService(EntityManagerInterface::$em);
+        $ParserService = new ParserService($this->em);
 
         $form = $this->createFormBuilder()
             ->add('URL', TextType::class)
@@ -41,63 +44,30 @@ class DashboardController extends AbstractDashboardController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $url = $request->request->all('form')['URL'];
-//            if (collectData()){
-                $result = $ParserService->collect($url);
-//Прописать условие? если товаров нет - возвращаем статистику - 0 товаров
-            } else echo 'URL has not valid values';
-//        }
-
-        return $this->render('/EasyAdminBundle/page/content.html.twig', [
-            'form' => $form->createView(),
-        ]);
-    }
-
-    public function collectData(Request $request)
-    {
-        $url = $request->request->all('form')['URL'];
-        //  Проверка URL
             if (preg_match("/^(?:ftp|https?|feed)?:?\/\/(?:(?:(?:[\w\.\-\+!$&'\(\)*\+,;=]|%[0-9a-f]{2})+:)*
     (?:[\w\.\-\+%!$&'\(\)*\+,;=]|%[0-9a-f]{2})+@)?(?:
     (?:[a-z0-9\-\.]|%[0-9a-f]{2})+|(?:\[(?:[0-9a-f]{0,4}:)*(?:[0-9a-f]{0,4})\]))(?::[0-9]+)?(?:[\/|\?]
-    (?:[\w#!:\.\?\+\|=&@$'~*,;\/\(\)\[\]\-]|%[0-9a-f]{2})*)?$/xi", $url))
-            {
-                return true;
+    (?:[\w#!:\.\?\+\|=&@$'~*,;\/\(\)\[\]\-]|%[0-9a-f]{2})*)?$/xi", $url)) {
+                $result = $ParserService->collect($url);
+                dd($ParserService->collect($url));
             }
-            else echo 'URL has not valid values';
-    }
+        }
+            return $this->render('/EasyAdminBundle/page/content.html.twig', [
+                'form' => $form->createView(),
+            ]);
+        }
 
+        public function configureDashboard(): Dashboard
+        {
+            return Dashboard::new()
+                ->setTitle('Parser for Ozon');
+        }
 
-//if ($form->isSubmitted() && $form->isValid()) {
-//$em = $this->getDoctrine()->getManager();
-//
-//    // Получаем информацию о товаре с Яндекс маркета.
-//    // Возвращаем объект с нужными свойствами и потом записываем их в продукт.
-//    // $y_market_url = $scrapper->parse($product->getUrl());
-//    // The current node list is empty.
-//
-//try {
-//$y_market_url = $scrapper->parse($product->getUrl());
-//} catch (\Exception $e) {
-//    return;
-//}
-//
-//            if (isset($y_market_url)) {
-//                $product->setTitle($y_market_url->title)
-//                    ->setPrice($y_market_url->price)
-//                    ->setDescription($y_market_url->description)
-//                    ->setImage($y_market_url->image);
-//            }
-//            $em->persist($product);
-//            $em->flush();
-    public function configureDashboard(): Dashboard
-    {
-        return Dashboard::new()
-            ->setTitle('Parser for Ozon');
+        public function configureMenuItems(): iterable
+        {
+            yield MenuItem::linkToDashboard('parser', 'fa fa-home');
+            // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class);
+            yield MenuItem::linkToCrud('Products', 'fas fa-map-marker-alt', Products::class);
+            yield MenuItem::linkToCrud('Seller', 'fas fa-comments', Seller::class);
+        }
     }
-
-    public function configureMenuItems(): iterable
-    {
-        yield MenuItem::linkToDashboard('parser', 'fa fa-home');
-        // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class);
-    }
-}

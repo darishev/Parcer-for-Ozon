@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=ProductsRepository::class)
+ * @ORM\HasLifecycleCallbacks
  */
 class Products
 {
@@ -35,23 +36,22 @@ class Products
     /**
      * @ORM\Column(type="integer", nullable=true)
      */
-    private $reviews_count;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $created_date;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $updated_date;
+    private $reviews;
 
     /**
      * @ORM\ManyToOne(targetEntity=Seller::class)
      * @ORM\JoinColumn(nullable=false)
      */
     private $seller;
+
+    /**
+     * @ORM\PrePersist
+     */
+
+    public function setCreatedAtValue()
+    {
+        $this->createdAt = new \DateTimeImmutable();
+    }
 
     public function getId(): ?int
     {
@@ -94,38 +94,14 @@ class Products
         return $this;
     }
 
-    public function getReviewsCount(): ?int
+    public function getReviews(): ?int
     {
-        return $this->reviews_count;
+        return $this->reviews;
     }
 
-    public function setReviewsCount(?int $reviews_count): self
+    public function setReviews(?int $reviews): self
     {
-        $this->reviews_count = $reviews_count;
-
-        return $this;
-    }
-
-    public function getCreatedDate(): ?int
-    {
-        return $this->created_date;
-    }
-
-    public function setCreatedDate(int $created_date): self
-    {
-        $this->created_date = $created_date;
-
-        return $this;
-    }
-
-    public function getUpdatedDate(): ?int
-    {
-        return $this->updated_date;
-    }
-
-    public function setUpdatedDate(int $updated_date): self
-    {
-        $this->updated_date = $updated_date;
+        $this->reviews = $reviews;
 
         return $this;
     }
